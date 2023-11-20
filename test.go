@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	println("서버 푸시")
+	println("서버 푸시!")
 }
