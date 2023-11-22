@@ -6,6 +6,19 @@
 
 ---
 
+## API
+
+Http 요청, 응답 바디의 JSON 데이터 키는 **snake_case**로 표현한다.  
+
+---
+
+## PostgreSQL
+
+RDB는 **PostgreSQL**을 사용한다.  
+[Docker PostgreSQL 설치 및 세팅 글(Connecting-팬도라)](https://judo0179.tistory.com/96)
+
+---
+
 ## IDE(vscode)
 
 [1] 테스트 함수 내 로그 출력 안되는 현상  
