@@ -23,7 +23,7 @@ func CheckPasswordPolicy(plainTextPwd string) (bool, error) {
 	if err != nil || !matched {
 		return false, errors.New("하나 이상의 문자가 포함되어야 합니다.")
 	}
-	matched, err = regexp.MatchString(`[a-zA-Z]+`, plainTextPwd)
+	matched, err = regexp.MatchString(`[0-9]+`, plainTextPwd)
 	if err != nil || !matched {
 		return false, errors.New("하나 이상의 숫자가 포함되어야 합니다.")
 	}
