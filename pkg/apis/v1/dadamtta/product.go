@@ -2,6 +2,9 @@ package dadamtta
 
 import (
 	"dadamtta/internal/product"
+	"dadamtta/pkg/apis"
+	"io"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,12 +27,36 @@ func NewProductCommand(router *gin.Engine) {
 
 func Register(router *gin.Engine, service product.Service) {
 	router.POST(`/v1/products`, func(c *gin.Context) {
-		categoryCode := ""
-		label := ""
-		const price uint32 = 100000
-		description := ""
-		content := ""
-		service.Register(categoryCode, label, price, description, content)
+		body := c.Request.Body
+		bytes, err := io.ReadAll(body)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		var dto ProductRegisterFormRequest
+		err = apis.BodyMapper[ProductRegisterFormRequest](bytes, &dto)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		productId, err := service.Register(dto.CategoryCode, dto.Label, dto.Price, dto.Description, dto.Content)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"message": productId,
+			})
+			return
+		}
 	})
 }
 
