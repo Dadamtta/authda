@@ -21,7 +21,6 @@ func (j *jwToken) GenerateToken(claims map[string]any) (string, error) {
 	for k, v := range claims {
 		claimMap[k] = v
 	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claimMap)
 	return token.SignedString([]byte(j.key))
 }

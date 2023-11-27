@@ -15,3 +15,7 @@ type UserSignInFormRequest struct {
 	Id  string `json:"id"`
 	Pwd string `json:"pwd"`
 }
+
+type UserTokenResponse struct {
+	AccessToken string `json"access_token"`
+}

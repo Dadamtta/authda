@@ -3,6 +3,7 @@ package dadamtta
 import (
 	"dadamtta/internal/user"
 	"dadamtta/pkg/apis"
+	"dadamtta/pkg/auth"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 func NewUserCommand(router *gin.Engine, repository user.Repository) {
 	service := user.NewService(repository)
 	SignUp(router, service)
+	SignIn(router, service)
 }
 
 func SignUp(router *gin.Engine, service user.Service) {
@@ -22,14 +24,14 @@ func SignUp(router *gin.Engine, service user.Service) {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
+			return
 		} else {
 			c.JSON(http.StatusOK, gin.H{
 				"message": userId,
 			})
+			return
 		}
-		return
 	})
-
 }
 
 func SignIn(router *gin.Engine, service user.Service) {
@@ -41,9 +43,21 @@ func SignIn(router *gin.Engine, service user.Service) {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
+			return
 		} else {
-			c.Status(http.StatusNoContent)
+			token, err := auth.New("access-token").GenerateToken(map[string]any{
+				"ExpiresAt": 60 * 60 * 24,
+			})
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"message": err.Error(),
+				})
+				return
+			}
+			c.JSON(http.StatusOK, UserTokenResponse{
+				AccessToken: token,
+			})
+			return
 		}
-		return
 	})
 }
