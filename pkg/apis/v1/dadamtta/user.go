@@ -14,7 +14,7 @@ func NewUserCommand(router *gin.Engine, repository user.Repository) {
 
 func SignUp(router *gin.Engine, service user.Service) {
 	router.POST("/v1/users/sign-up", func(c *gin.Context) {
-
+		// 데이터 RSA 공개키 암호화 처리 되어 있음 (session에서 제어)
 		userId, err := service.SignUp("", "", "", "", "", 0, 0)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
@@ -28,6 +28,8 @@ func SignUp(router *gin.Engine, service user.Service) {
 	})
 }
 
-func SignIn() {
-
+func SignIn(router *gin.Engine, service user.Service) {
+	router.POST("/v1/users/sign-in", func(c *gin.Context) {
+		// 아이디, 패스워드 RSA 공개키 암호화 처리 되어 있음 (session에서 제어)
+	})
 }

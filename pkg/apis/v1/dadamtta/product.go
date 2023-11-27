@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewProductCommand(router *gin.Engine) {
-	service := product.NewService()
+func NewProductCommand(router *gin.Engine, repository product.Repository) {
+	service := product.NewService(repository)
 
 	// 상품 등록
 	Register(router, service)
