@@ -68,3 +68,16 @@ test 커맨드 실행 시 `-v` 옵션을 줘야 로그가 출력된다.
     "-v",
 ]
 ```
+
+[2] 툴에서 디버깅하는 방법  
+VSCode `launch.json` 파일에서 configurations를 수정한다.  
+
+```text
+{
+    "name": "Launch Package",
+    "type": "go",
+    "request": "launch",
+    "mode": "auto",
+    "program": "cmd/dadamtta"
+}
+```

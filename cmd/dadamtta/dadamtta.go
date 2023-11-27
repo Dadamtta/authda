@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -24,9 +24,13 @@ func main() {
 	println("진입점")
 	// 웹 서버 실행
 	router := gin.Default()
-	cookieStore := cookie.NewStore([]byte("secret"))
-	cookieStore.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // 1Day
-	router.Use(sessions.Sessions("session", cookieStore))
+	redisStore, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
+	if err != nil {
+		panic(err)
+	}
+	// cookieStore := cookie.NewStore([]byte("secret"))
+	// cookieStore.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // 1Day
+	router.Use(sessions.Sessions("session", redisStore))
 	dadamtta.NewCommand(router, db)
 	router.Run()
 	println("종료")

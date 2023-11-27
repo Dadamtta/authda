@@ -11,4 +11,5 @@ import (
 func NewCommand(router *gin.Engine, db *gorm.DB) {
 	// route 등록
 	dadamtta.NewUserCommand(router, user.NewRdbRepository(db))
+	dadamtta.NewRSACommand(router)
 }

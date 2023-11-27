@@ -8,6 +8,20 @@ import (
 	"testing"
 )
 
+func TestRSAPrivateKeyEncodeDecode(t *testing.T) {
+	serverPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+	_, err = x509.MarshalPKCS8PrivateKey(serverPrivateKey)
+	if err != nil {
+		t.Error(err.Error())
+		return
+	}
+	t.Log("정상")
+}
+
 func TestRSAEncodeDecode(t *testing.T) {
 	// 서버에서 키 생성
 	serverPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)

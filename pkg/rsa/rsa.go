@@ -12,14 +12,21 @@ func GenerateRSA(bits int) (base64EncodedPrivateKeyPem, base64EncodedPublicKeyPe
 	serverPrivateKey, err := rsa.GenerateKey(rand.Reader, bits)
 	if err != nil {
 		// todo 에러
+		println(err.Error())
 		return
 	}
-	base64EncodedPrivateKeyPem, err = GetBase64EncodedPrivateKeyPem(*serverPrivateKey)
+	base64EncodedPrivateKeyPem, err = GetBase64EncodedPrivateKeyPem(serverPrivateKey)
 	if err != nil {
 		// todo 에러
+		println(err.Error())
 		return
 	}
 	base64EncodedPublicKeyPem, err = GetBase64EncodedPublicKeyPem(base64EncodedPrivateKeyPem)
+	if err != nil {
+		// todo 에러
+		println(err.Error())
+		return
+	}
 	return
 }
 
@@ -27,6 +34,7 @@ func DecryptBase64EncodedPrivateKeyPem(encryptedData []byte, base64EncodedPrivat
 	privateKey, err := DecodeBase64PrivateKeyPem(base64EncodedPrivateKeyPem)
 	if err != nil {
 		// todo 에러
+		println(err.Error())
 		return
 	}
 	decryptedBytes, err := rsa.DecryptPKCS1v15(
@@ -38,10 +46,11 @@ func DecryptBase64EncodedPrivateKeyPem(encryptedData []byte, base64EncodedPrivat
 	return
 }
 
-func GetBase64EncodedPrivateKeyPem(privateKey rsa.PrivateKey) (base64EncodedPrivateKeyPem string, err error) {
+func GetBase64EncodedPrivateKeyPem(privateKey *rsa.PrivateKey) (base64EncodedPrivateKeyPem string, err error) {
 	privateX509, err := x509.MarshalPKCS8PrivateKey(privateKey)
 	if err != nil {
 		// todo 에러
+		println(err.Error())
 		return
 	}
 
@@ -70,11 +79,13 @@ func GetBase64EncodedPublicKeyPem(base64EncodedPrivateKeyPem string) (base64Enco
 	privateKey, err := DecodeBase64PrivateKeyPem(base64EncodedPrivateKeyPem)
 	if err != nil {
 		// todo 에러
+		println(err.Error())
 		return
 	}
-	publicX509, err := x509.MarshalPKIXPublicKey(privateKey.PublicKey)
+	publicX509, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
 	if err != nil {
 		// todo 에러
+		println(err.Error())
 		return
 	}
 	publicBlock := pem.Block{

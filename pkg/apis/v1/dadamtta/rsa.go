@@ -24,6 +24,10 @@ func GetPublicKey(router *gin.Engine) {
 			base64EncodedPrivateKeyPem, base64EncodedPublicKeyPem := rsa.GenerateRSA(2048)
 			publicKey = base64EncodedPublicKeyPem
 			session.Set("PrivateKey", base64EncodedPrivateKeyPem)
+			err := session.Save()
+			if err != nil {
+				println(err.Error())
+			}
 		} else {
 			publicKeyString, err := rsa.GetBase64EncodedPublicKeyPem(base64EncodedPrivateKeyPem.(string))
 			if err != nil {
@@ -38,6 +42,5 @@ func GetPublicKey(router *gin.Engine) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": publicKey,
 		})
-		return
 	})
 }
