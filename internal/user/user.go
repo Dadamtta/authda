@@ -1,16 +1,20 @@
 package user
 
-import "errors"
+import (
+	"errors"
+
+	"golang.org/x/crypto/bcrypt"
+)
 
 type user struct {
-	Id      string
-	Pwd     string
-	Email   string
-	Name    string
-	Phone   string
-	Age     uint8
-	Gender  uint8
-	Deleted bool
+	Id        string
+	HashedPwd string
+	Email     string
+	Name      string
+	Phone     string
+	Age       uint8
+	Gender    uint8
+	Deleted   bool
 }
 
 func NewUser() *user {
@@ -26,15 +30,19 @@ func GenerateUser(id, pwd, phone, email, name string, age, gender uint8) (*user,
 		return nil, errors.New("휴대폰 정보는 필수 값 입니다")
 	}
 	if pwd == "" {
-		return nil, errors.New("패스워드는 필수 값 입니다")
+		return nil, errors.New("회원가입 시 패스워드 필수 입력")
+	}
+	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(pwd), 10)
+	if err != nil {
+		return nil, errors.New("패스워드 해싱 실패")
 	}
 	return &user{
-		Id:      id,
-		Pwd:     pwd,
-		Name:    name,
-		Phone:   phone,
-		Age:     age,
-		Gender:  gender,
-		Deleted: false,
+		Id:        id,
+		HashedPwd: string(hashedPwd),
+		Name:      name,
+		Phone:     phone,
+		Age:       age,
+		Gender:    gender,
+		Deleted:   false,
 	}, nil
 }

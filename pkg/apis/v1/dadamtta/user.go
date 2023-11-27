@@ -2,6 +2,7 @@ package dadamtta
 
 import (
 	"dadamtta/internal/user"
+	"dadamtta/pkg/apis"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,9 +14,10 @@ func NewUserCommand(router *gin.Engine, repository user.Repository) {
 }
 
 func SignUp(router *gin.Engine, service user.Service) {
-	router.POST("/v1/users/sign-up", func(c *gin.Context) {
-		// 데이터 RSA 공개키 암호화 처리 되어 있음 (session에서 제어)
-		userId, err := service.SignUp("", "", "", "", "", 0, 0)
+	router.POST("/v1/users/sign-up", func(c *gin.Context) { // Body RSA Encoded
+		dto := UserRegisterFormRequest{}
+		apis.BodyMapperWithDecrypt(c, &dto)
+		userId, err := service.SignUp(dto.Id, dto.Pwd, dto.Phone, dto.Email, dto.Name, dto.Age, dto.Gender)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -25,11 +27,23 @@ func SignUp(router *gin.Engine, service user.Service) {
 				"message": userId,
 			})
 		}
+		return
 	})
+
 }
 
 func SignIn(router *gin.Engine, service user.Service) {
-	router.POST("/v1/users/sign-in", func(c *gin.Context) {
-		// 아이디, 패스워드 RSA 공개키 암호화 처리 되어 있음 (session에서 제어)
+	router.POST("/v1/users/sign-in", func(c *gin.Context) { // Body RSA Encoded
+		dto := UserSignInFormRequest{}
+		apis.BodyMapperWithDecrypt(c, &dto)
+		err := service.SignIn(dto.Id, dto.Pwd)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+		} else {
+			c.Status(http.StatusNoContent)
+		}
+		return
 	})
 }

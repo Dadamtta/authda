@@ -40,6 +40,8 @@
 > (서버) 1. 전달받은 암호화된 데이터를 `개인키`로 복호화한다.  
 > (서버) 2. 저장했던 `개인키`를 폐기한다.
 
+[Go crypto RSA Key 인코딩/디코딩](https://www.vompressor.com/go-cypto-rsa2/)
+
 ---
 
 ## API

@@ -17,5 +17,6 @@ func NewRdbRepository(db *gorm.DB) Repository {
 }
 
 func (*rdbRepository) Save(user user) error {
+	// 패스워드 단방향 암호화 진행
 	return nil
 }

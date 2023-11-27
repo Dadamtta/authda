@@ -2,7 +2,7 @@ package user
 
 type Service interface {
 	SignUp(id, pwd, phone, email, name string, age, gender uint8) (string, error)
-	SignIn()
+	SignIn(id, pwd string) error
 }
 
 type service struct {
@@ -29,6 +29,7 @@ func (s *service) SignUp(id, pwd, phone, email, name string, age, gender uint8) 
 	return newUser.Id, err
 }
 
-func (*service) SignIn() {
+func (*service) SignIn(id, pwd string) error {
 	println("로그인 진행")
+	return nil
 }
