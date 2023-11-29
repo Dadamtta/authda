@@ -47,12 +47,7 @@ func DecryptBase64EncodedPrivateKeyPem(encryptedData []byte, base64EncodedPrivat
 }
 
 func GetBase64EncodedPrivateKeyPem(privateKey *rsa.PrivateKey) (base64EncodedPrivateKeyPem string, err error) {
-	privateX509, err := x509.MarshalPKCS8PrivateKey(privateKey)
-	if err != nil {
-		// todo 에러
-		println(err.Error())
-		return
-	}
+	privateX509 := x509.MarshalPKCS1PrivateKey(privateKey)
 
 	privateBlock := pem.Block{
 		Type:  "PRIVATE KEY",
@@ -62,19 +57,6 @@ func GetBase64EncodedPrivateKeyPem(privateKey *rsa.PrivateKey) (base64EncodedPri
 	return
 }
 
-func DecodeBase64PrivateKeyPem(base64EncodedPrivateKeyPem string) (*rsa.PrivateKey, error) {
-	privateKeyPem, err := base64.StdEncoding.DecodeString(base64EncodedPrivateKeyPem)
-	if err != nil {
-		return nil, err
-	}
-	privateKeyBlock, _ := pem.Decode(privateKeyPem)
-	privateKeyAny, err := x509.ParsePKCS8PrivateKey(privateKeyBlock.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	return privateKeyAny.(*rsa.PrivateKey), nil
-}
-
 func GetBase64EncodedPublicKeyPem(base64EncodedPrivateKeyPem string) (base64EncodedPublicKeyPem string, err error) {
 	privateKey, err := DecodeBase64PrivateKeyPem(base64EncodedPrivateKeyPem)
 	if err != nil {
@@ -82,16 +64,25 @@ func GetBase64EncodedPublicKeyPem(base64EncodedPrivateKeyPem string) (base64Enco
 		println(err.Error())
 		return
 	}
-	publicX509, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
-	if err != nil {
-		// todo 에러
-		println(err.Error())
-		return
-	}
+	publicX509 := x509.MarshalPKCS1PublicKey(&privateKey.PublicKey)
+
 	publicBlock := pem.Block{
 		Type:  "PUBLIC KEY",
 		Bytes: publicX509,
 	}
 	base64EncodedPublicKeyPem = base64.StdEncoding.EncodeToString(pem.EncodeToMemory(&publicBlock))
 	return
+}
+
+func DecodeBase64PrivateKeyPem(base64EncodedPrivateKeyPem string) (*rsa.PrivateKey, error) {
+	privateKeyPem, err := base64.StdEncoding.DecodeString(base64EncodedPrivateKeyPem)
+	if err != nil {
+		return nil, err
+	}
+	privateKeyBlock, _ := pem.Decode(privateKeyPem)
+	privateKeyAny, err := x509.ParsePKCS1PrivateKey(privateKeyBlock.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	return privateKeyAny, nil
 }
