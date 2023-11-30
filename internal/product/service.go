@@ -1,8 +1,10 @@
 package product
 
+import "dadamtta/internal/sql"
+
 type Service interface {
-	Register(categoryCode, label string, price uint32, description, content string) (string, error)
-	Search()
+	Register(adminId, categoryCode, label string, price uint32, description, content string) (string, error)
+	Search(options *sql.SearchOptions)
 	Get(productId string)
 	Update()
 	Delete(productId string)
@@ -18,13 +20,15 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) Register(categoryCode, label string, price uint32, description, content string) (id string, err error) {
+func (s *service) Register(adminId, categoryCode, label string, price uint32, description, content string) (id string, err error) {
+	// admin
+
 	// 카테고리 확인 todo 카테고리 조회
-	product, err := GenerateProduct(categoryCode, label, price, description, content)
+	product, err := GenerateProduct(adminId, categoryCode, label, price, description, content)
 	if err != nil {
 		return
 	}
-	s.repository.Save(*product)
+	err = s.repository.Save(*product)
 	if err != nil {
 		return
 	}
@@ -32,7 +36,7 @@ func (s *service) Register(categoryCode, label string, price uint32, description
 	return
 }
 
-func (s *service) Search() {
+func (s *service) Search(options *sql.SearchOptions) {
 
 }
 

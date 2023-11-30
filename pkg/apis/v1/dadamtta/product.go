@@ -2,8 +2,8 @@ package dadamtta
 
 import (
 	"dadamtta/internal/product"
+	"dadamtta/internal/sql"
 	"dadamtta/pkg/apis"
-	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -27,17 +27,10 @@ func NewProductCommand(router *gin.Engine, repository product.Repository) {
 
 func Register(router *gin.Engine, service product.Service) {
 	router.POST(`/v1/products`, func(c *gin.Context) {
-		body := c.Request.Body
-		bytes, err := io.ReadAll(body)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": err.Error(),
-			})
-			return
-		}
-
+		// Header에서 ID
+		adminId := ""
 		var dto ProductRegisterFormRequest
-		err = apis.BodyMapper[ProductRegisterFormRequest](bytes, &dto)
+		err := apis.BodyMapper[ProductRegisterFormRequest](c, &dto)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -45,14 +38,14 @@ func Register(router *gin.Engine, service product.Service) {
 			return
 		}
 
-		productId, err := service.Register(dto.CategoryCode, dto.Label, dto.Price, dto.Description, dto.Content)
+		productId, err := service.Register(adminId, dto.CategoryCode, dto.Label, dto.Price, dto.Description, dto.Content)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
 			})
 			return
 		} else {
-			c.JSON(http.StatusOK, gin.H{
+			c.JSON(http.StatusCreated, gin.H{
 				"message": productId,
 			})
 			return
@@ -62,7 +55,19 @@ func Register(router *gin.Engine, service product.Service) {
 
 func Search(router *gin.Engine, service product.Service) {
 	router.GET(`/v1/products`, func(c *gin.Context) {
-		service.Search()
+		options, err := sql.NewSearchOptions(c.Param("page"), c.Param("listSize"), c.Param("sorter"), c.Param("component"), c.Param("q"))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+
+		service.Search(options)
+
+		c.JSON(http.StatusOK, gin.H{
+			"message": "",
+		})
 	})
 }
 

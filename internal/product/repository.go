@@ -1,9 +1,14 @@
 package product
 
-import "gorm.io/gorm"
+import (
+	"dadamtta/internal/sql"
+
+	"gorm.io/gorm"
+)
 
 type Repository interface {
 	Save(product product) error
+	Search(options *sql.SearchOptions)
 }
 
 type rdbRepository struct {
@@ -18,4 +23,8 @@ func NewRdbRepository(db *gorm.DB) Repository {
 
 func (*rdbRepository) Save(product product) error {
 	return nil
+}
+
+func (*rdbRepository) Search(options *sql.SearchOptions) {
+
 }

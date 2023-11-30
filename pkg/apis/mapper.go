@@ -6,12 +6,22 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"io"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
-func BodyMapper[T any](bytes []byte, t *T) error {
+func BodyMapper[T any](c *gin.Context, t *T) error {
+	body := c.Request.Body
+	bytes, err := io.ReadAll(body)
+	if err != nil {
+		return err
+	}
+	return BytesMapper[T]([]byte(bytes), t)
+}
+
+func BytesMapper[T any](bytes []byte, t *T) error {
 	return json.Unmarshal([]byte(bytes), &t)
 }
 
@@ -32,5 +42,5 @@ func BodyMapperWithDecrypt[T any](c *gin.Context, t *T) error {
 	if err != nil {
 		return errors.New(err.Error())
 	}
-	return BodyMapper[T]([]byte(requestData), t)
+	return BytesMapper[T]([]byte(requestData), t)
 }
