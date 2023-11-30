@@ -19,7 +19,7 @@ func SignUp(router *gin.Engine, service user.Service) {
 	router.POST("/v1/users/sign-up", func(c *gin.Context) { // Body RSA Encoded
 		dto := UserRegisterFormRequest{}
 		apis.BodyMapperWithDecrypt(c, &dto)
-		userId, err := service.SignUp(dto.Id, dto.Pwd, dto.Phone, dto.Email, dto.Name, dto.Age, dto.Gender)
+		userId, err := service.SignUp(dto.Id, dto.Pwd, dto.Phone, dto.Email, dto.Name)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),
@@ -37,8 +37,14 @@ func SignUp(router *gin.Engine, service user.Service) {
 func SignIn(router *gin.Engine, service user.Service) {
 	router.POST("/v1/users/sign-in", func(c *gin.Context) { // Body RSA Encoded
 		dto := UserSignInFormRequest{}
-		apis.BodyMapperWithDecrypt(c, &dto)
-		err := service.SignIn(dto.Id, dto.Pwd)
+		err := apis.BodyMapperWithDecrypt(c, &dto)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		}
+		err = service.SignIn(dto.Id, dto.Pwd)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": err.Error(),

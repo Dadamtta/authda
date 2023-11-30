@@ -3,6 +3,7 @@ package apis
 import (
 	"bytes"
 	"dadamtta/pkg/rsa"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 
@@ -23,7 +24,11 @@ func BodyMapperWithDecrypt[T any](c *gin.Context, t *T) error {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(c.Request.Body)
 	encodedRequestData := buf.String()
-	requestData, err := rsa.DecryptBase64EncodedPrivateKeyPem([]byte(encodedRequestData), base64EncodedPrivateKeyPem.(string))
+	data, err := base64.StdEncoding.DecodeString(encodedRequestData)
+	if err != nil {
+		return err
+	}
+	requestData, err := rsa.DecryptBase64EncodedPrivateKeyPem(data, base64EncodedPrivateKeyPem.(string))
 	if err != nil {
 		return errors.New(err.Error())
 	}

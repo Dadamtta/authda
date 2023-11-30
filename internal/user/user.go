@@ -21,7 +21,7 @@ func NewUser() *user {
 	return &user{}
 }
 
-func GenerateUser(id, pwd, phone, email, name string, age, gender uint8) (*user, error) {
+func GenerateUser(id, pwd, phone, email, name string) (*user, error) {
 	if id == "" {
 		return nil, errors.New("ID 정보는 필수 값 입니다")
 	}
@@ -41,8 +41,6 @@ func GenerateUser(id, pwd, phone, email, name string, age, gender uint8) (*user,
 		HashedPwd: string(hashedPwd),
 		Name:      name,
 		Phone:     phone,
-		Age:       age,
-		Gender:    gender,
 		Deleted:   false,
 	}, nil
 }

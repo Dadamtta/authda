@@ -30,8 +30,17 @@ func main() {
 	}
 	// cookieStore := cookie.NewStore([]byte("secret"))
 	// cookieStore.Options(sessions.Options{MaxAge: 60 * 60 * 24}) // 1Day
-	router.Use(sessions.Sessions("session", redisStore))
+	router.Use(sessions.Sessions("session", redisStore), CORSMiddleware())
 	dadamtta.NewCommand(router, db)
 	router.Run()
 	println("종료")
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Origin")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Next()
+	}
 }

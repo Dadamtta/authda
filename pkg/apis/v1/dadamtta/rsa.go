@@ -1,6 +1,7 @@
 package dadamtta
 
 import (
+	"dadamtta/pkg/apis"
 	"dadamtta/pkg/rsa"
 	"net/http"
 
@@ -11,7 +12,25 @@ import (
 func NewRSACommand(router *gin.Engine) {
 
 	GetPublicKey(router)
+	CheckDecrypt(router)
 
+}
+
+func CheckDecrypt(router *gin.Engine) {
+	router.POST(`/v1/rsa/check`, func(c *gin.Context) {
+		var test *string
+		err := apis.BodyMapperWithDecrypt[string](c, test)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": err.Error(),
+			})
+			return
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"message": test,
+			})
+		}
+	})
 }
 
 func GetPublicKey(router *gin.Engine) {
@@ -20,11 +39,11 @@ func GetPublicKey(router *gin.Engine) {
 		base64EncodedPrivateKeyPem := session.Get("PrivateKey")
 		var publicKey string = ""
 		if base64EncodedPrivateKeyPem == nil {
-			// 현재 세션으로 새로 만들기
 			base64EncodedPrivateKeyPem, base64EncodedPublicKeyPem := rsa.GenerateRSA(2048)
 			publicKey = base64EncodedPublicKeyPem
 			session.Set("PrivateKey", base64EncodedPrivateKeyPem)
 			err := session.Save()
+
 			if err != nil {
 				println(err.Error())
 			}
@@ -39,8 +58,9 @@ func GetPublicKey(router *gin.Engine) {
 			}
 			publicKey = publicKeyString
 		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": publicKey,
+			"base64EncodedPublicKeyPem": publicKey,
 		})
 	})
 }

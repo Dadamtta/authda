@@ -1,13 +1,11 @@
 package dadamtta
 
 type UserRegisterFormRequest struct {
-	Id     string `json:"id"`
-	Pwd    string `json:"pwd"`
-	Email  string `json:"email"`
-	Name   string `json:"name"`
-	Phone  string `json:"phone"`
-	Age    uint8  `json:"age"`
-	Gender uint8  `json:"gender"`
+	Id    string `json:"id"`
+	Pwd   string `json:"pwd"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	Phone string `json:"phone"`
 }
 
 // 홈페이지 입력 폼에서 로그인 요청

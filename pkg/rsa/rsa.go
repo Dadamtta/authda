@@ -42,6 +42,7 @@ func DecryptBase64EncodedPrivateKeyPem(encryptedData []byte, base64EncodedPrivat
 		privateKey,
 		encryptedData,
 	)
+
 	data = string(decryptedBytes)
 	return
 }

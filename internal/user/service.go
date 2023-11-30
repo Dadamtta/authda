@@ -1,7 +1,7 @@
 package user
 
 type Service interface {
-	SignUp(id, pwd, phone, email, name string, age, gender uint8) (string, error)
+	SignUp(id, pwd, phone, email, name string) (string, error)
 	SignIn(id, pwd string) error
 }
 
@@ -15,9 +15,9 @@ func NewService(userRepository Repository) Service {
 	}
 }
 
-func (s *service) SignUp(id, pwd, phone, email, name string, age, gender uint8) (string, error) {
+func (s *service) SignUp(id, pwd, phone, email, name string) (string, error) {
 	println("회원가입 진행")
-	newUser, err := GenerateUser(id, pwd, phone, email, name, age, gender)
+	newUser, err := GenerateUser(id, pwd, phone, email, name)
 	if err != nil {
 		return "", err
 	}
