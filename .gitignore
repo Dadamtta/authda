@@ -1,7 +1,9 @@
 /private/p_appl
+/private/p_admin
+/private/p_policy
+/private/p_product
 /private/_sql
 /private/_user
-/private/_product
 .vscode
 
 # If you prefer the allow list template instead of the deny list, see community template:
