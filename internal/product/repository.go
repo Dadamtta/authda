@@ -11,6 +11,13 @@ type Repository interface {
 	Search(options *sql.SearchOptions)
 }
 
+type CategoryRepository interface {
+	Save(category Category) error
+	FindByCode(code string) Category
+	UpdateByCode(code, name string) Category
+	DeleteByCode(code string) error
+}
+
 type rdbRepository struct {
 	db *gorm.DB
 }

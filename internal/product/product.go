@@ -2,6 +2,7 @@ package product
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -21,7 +22,6 @@ type product struct {
 	Price        uint32
 	Description  string
 	Content      string
-	Hits         uint32
 	State        State
 }
 
@@ -38,7 +38,25 @@ func GenerateProduct(adminId, categoryCode, label string, price uint32, descript
 		Price:        price,
 		Description:  description,
 		Content:      content,
-		Hits:         0,
 		State:        OnSale,
 	}, nil
+}
+
+type Category struct {
+	Code       string
+	Name       string
+	ParentCode string
+	Layer      uint8
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+}
+
+func GenerateCategory(code string, name string, parentCode string, layer uint8) *Category {
+	return &Category{
+		Code:       code,
+		Name:       name,
+		ParentCode: parentCode,
+		Layer:      layer,
+		CreatedAt:  time.Now(),
+	}
 }
