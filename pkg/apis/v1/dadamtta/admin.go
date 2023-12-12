@@ -2,7 +2,6 @@ package dadamtta
 
 import (
 	"dadamtta/internal/admin"
-	"dadamtta/internal/common/errorc"
 	"dadamtta/pkg/apis"
 	"dadamtta/pkg/apis/response"
 	"dadamtta/pkg/utils/logger"
@@ -24,34 +23,22 @@ func Login(router *gin.Engine, service admin.Service) {
 		if err != nil {
 			logger.Error("[Mapping] Request DTO Decrypt Mapping Error.")
 			// 400
-			if response.HandleResponseErrorWithCustomMessage(c, errorc.DtoUnmarshalError, "") {
-				return
-			} else {
-				c.Status(http.StatusBadRequest)
-				return
-			}
+			c.AbortWithStatusJSON(http.StatusBadRequest, response.NewErrorResponse(response.ERROR_DTO_UNMARSHAL, ""))
+			return
 		}
 		err = service.Login(dto.Id, dto.Pwd)
 		if err != nil {
 			logger.Error(fmt.Sprintf("[Func] Login Fail. ID -> %s", dto.Id))
 			// 401
-			if response.HandleResponseErrorWithCustomMessage(c, errorc.AuthorizedError, "") {
-				return
-			} else {
-				c.Status(http.StatusUnauthorized)
-				return
-			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response.NewErrorResponse(response.ERROR_AUTHORIZED, ""))
+			return
 		}
-		token, err := GenerateAdminAccessToken(dto.Id)
+		token, err := apis.GenerateAdminAccessToken(dto.Id)
 		if err != nil {
 			logger.Error(fmt.Sprintf("[Token] Generate Token Error. ID -> %s", dto.Id))
 			// 500
-			if response.HandleResponseErrorWithCustomMessage(c, errorc.TokenGenerateError, "") {
-				return
-			} else {
-				c.Status(http.StatusInternalServerError)
-				return
-			}
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response.NewErrorResponse(response.ERROR_ENTITY_NOTFOUND, ""))
+			return
 		}
 		// 200
 		c.AbortWithStatusJSON(http.StatusOK, AdminTokenResponse{

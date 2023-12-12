@@ -1,6 +1,7 @@
 package appl
 
 import (
+	"dadamtta/private/p_policy"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,13 +25,20 @@ type Appl struct {
 }
 
 func GenerateAppl(userId, productId string) Appl {
+	expiredAt := time.Now()
+	expiredAt.Add(time.Hour * p_policy.APP_EXPIRED_AT_HOURS)
 	return Appl{
 		ID:        uuid.New().String(),
 		UserId:    userId,
 		ProductId: productId,
 		State:     APPL_ACTIVE,
 		CreatedAt: time.Now(),
+		ExpiredAt: expiredAt,
 	}
+}
+
+func (a *Appl) IsActive() bool {
+	return a.State == APPL_ACTIVE
 }
 
 type ImageState int

@@ -7,8 +7,9 @@ import (
 )
 
 type Repository interface {
-	Save(product product) error
+	Save(product Product) error
 	Search(options *sql.SearchOptions)
+	FindById(id string) *Product
 }
 
 type CategoryRepository interface {
@@ -28,10 +29,14 @@ func NewRdbRepository(db *gorm.DB) Repository {
 	}
 }
 
-func (*rdbRepository) Save(product product) error {
+func (*rdbRepository) Save(product Product) error {
 	return nil
 }
 
 func (*rdbRepository) Search(options *sql.SearchOptions) {
 
+}
+
+func (*rdbRepository) FindById(id string) *Product {
+	return nil
 }

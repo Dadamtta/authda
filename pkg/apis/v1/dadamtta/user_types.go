@@ -15,5 +15,13 @@ type UserSignInFormRequest struct {
 }
 
 type UserTokenResponse struct {
-	AccessToken string `json"access_token"`
+	AccessToken string `json:"access_token"`
+}
+
+type UserAppRegisterRequest struct {
+	ProductId string `json:"product_id"`
+}
+
+type UserAppRegisterResponse struct {
+	AppId string `json:"app_id"`
 }

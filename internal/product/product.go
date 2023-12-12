@@ -12,9 +12,10 @@ type State int
 const (
 	Pause  State = 0
 	OnSale State = 1
+	Free   State = 99
 )
 
-type product struct {
+type Product struct {
 	Id           string
 	CategoryCode string
 	AdminId      string
@@ -25,12 +26,12 @@ type product struct {
 	State        State
 }
 
-func GenerateProduct(adminId, categoryCode, label string, price uint32, description, content string) (*product, error) {
+func GenerateProduct(adminId, categoryCode, label string, price uint32, description, content string) (*Product, error) {
 	if label == "" {
 		return nil, errors.New("상품명 정보 입력 누락")
 	}
 	// todo category code 확인
-	return &product{
+	return &Product{
 		Id:           uuid.New().String(),
 		CategoryCode: categoryCode,
 		AdminId:      adminId,
@@ -40,6 +41,14 @@ func GenerateProduct(adminId, categoryCode, label string, price uint32, descript
 		Content:      content,
 		State:        OnSale,
 	}, nil
+}
+
+func (p *Product) IsOnSale() bool {
+	return p.State == OnSale
+}
+
+func (p *Product) IsFree() bool {
+	return p.State == Free
 }
 
 type Category struct {
