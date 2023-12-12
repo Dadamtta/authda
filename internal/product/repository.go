@@ -13,8 +13,8 @@ type Repository interface {
 
 type CategoryRepository interface {
 	Save(category Category) error
-	FindByCode(code string) Category
-	UpdateByCode(code, name string) Category
+	FindByCode(code string) *Category
+	UpdateByCode(code, name string) *Category
 	DeleteByCode(code string) error
 }
 

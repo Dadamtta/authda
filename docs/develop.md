@@ -48,6 +48,22 @@
 
 Http 요청, 응답 바디의 JSON 데이터 키는 **snake_case**로 표현한다.  
 
+커스텀 `errors`로 에러 상황을 모두 대응한다.  
+api error response 핸들러를 만들어서 커스텀 `errors`를 처리한다.  
+등록되지 않는 errors가 발생하면 Response Code는 메시지가 없는 Http Status Code를 뱉는다.
+
+---
+
+## Logging
+
+Log 라이브러리는 `zap`를 사용한다.  
+Log는 나중에 찾아보기 쉽게 작성한다.  
+
+> ** 작성 규칙  
+> [Mapping] DTO 마샬, 언마샬  
+> [Func] 기능  
+> [Token] 토큰
+
 ---
 
 ## PostgreSQL

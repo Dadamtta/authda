@@ -1,7 +1,15 @@
 package admin
 
+import (
+	"dadamtta/internal/common/errorc"
+	"dadamtta/pkg/utils/logger"
+	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
 type Service interface {
-	LogIn(id, plainPwd string) error
+	Login(id, plainPwd string) error
 }
 
 type service struct {
@@ -14,10 +22,15 @@ func NewService(repository Repository) Service {
 	}
 }
 
-func (s *service) LogIn(id, plainPwd string) error {
+func (s *service) Login(id, plainPwd string) (err error) {
 	admin := s.repository.FindById(id)
-
-	println(admin)
-
-	return nil
+	if admin == nil {
+		err = errorc.EntityNotFoundError
+		return
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(admin.HashedPwd), []byte(plainPwd))
+	if err != nil {
+		logger.Error(fmt.Sprintf("[Token] Generate Token Error. ID -> %s", id))
+	}
+	return
 }

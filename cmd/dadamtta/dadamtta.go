@@ -2,6 +2,7 @@ package main
 
 import (
 	"dadamtta/pkg/cmd/dadamtta"
+	"dadamtta/pkg/utils/logger"
 	"fmt"
 
 	"github.com/gin-contrib/sessions"
@@ -21,7 +22,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	println("진입점")
+	logger.Debug("진입점")
 	// 웹 서버 실행
 	router := gin.Default()
 	redisStore, err := redis.NewStore(10, "tcp", "localhost:6379", "", []byte("secret"))
@@ -33,7 +34,7 @@ func main() {
 	router.Use(sessions.Sessions("session", redisStore), CORSMiddleware())
 	dadamtta.NewCommand(router, db)
 	router.Run()
-	println("종료")
+	logger.Debug("종료")
 }
 
 func CORSMiddleware() gin.HandlerFunc {

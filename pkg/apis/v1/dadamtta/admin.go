@@ -2,7 +2,11 @@ package dadamtta
 
 import (
 	"dadamtta/internal/admin"
+	"dadamtta/internal/common/errorc"
 	"dadamtta/pkg/apis"
+	"dadamtta/pkg/apis/response"
+	"dadamtta/pkg/utils/logger"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,28 +14,47 @@ import (
 
 func NewAdminCommand(router *gin.Engine, repository admin.Repository) {
 	service := admin.NewService(repository)
-	LogIn(router, service)
+	Login(router, service)
 }
 
-func LogIn(router *gin.Engine, service admin.Service) {
-	router.POST("/v1/admins/log-in", func(c *gin.Context) {
+func Login(router *gin.Engine, service admin.Service) {
+	router.POST("/v1/admins/login", func(c *gin.Context) {
 		dto := AdminLogInFormRequest{}
 		err := apis.BodyMapperWithDecrypt(c, &dto)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{})
-			return
+			logger.Error("[Mapping] Request DTO Decrypt Mapping Error.")
+			// 400
+			if response.HandleResponseErrorWithCustomMessage(c, errorc.DtoUnmarshalError, "") {
+				return
+			} else {
+				c.Status(http.StatusBadRequest)
+				return
+			}
 		}
-		err = service.LogIn(dto.Id, dto.Pwd)
+		err = service.Login(dto.Id, dto.Pwd)
 		if err != nil {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{})
-			return
+			logger.Error(fmt.Sprintf("[Func] Login Fail. ID -> %s", dto.Id))
+			// 401
+			if response.HandleResponseErrorWithCustomMessage(c, errorc.AuthorizedError, "") {
+				return
+			} else {
+				c.Status(http.StatusUnauthorized)
+				return
+			}
 		}
 		token, err := GenerateAdminAccessToken(dto.Id)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{})
-			return
+			logger.Error(fmt.Sprintf("[Token] Generate Token Error. ID -> %s", dto.Id))
+			// 500
+			if response.HandleResponseErrorWithCustomMessage(c, errorc.TokenGenerateError, "") {
+				return
+			} else {
+				c.Status(http.StatusInternalServerError)
+				return
+			}
 		}
-		c.JSON(http.StatusOK, AdminTokenResponse{
+		// 200
+		c.AbortWithStatusJSON(http.StatusOK, AdminTokenResponse{
 			AccessToken: token,
 		})
 	})
