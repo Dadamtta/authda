@@ -17,5 +17,7 @@ type ImageRepository interface {
 	UpdateState(imageId string, state ImageState) error
 }
 
-type DataRepository interface {
+type DataRepository[T any] interface {
+	FindById(applId string)
+	SaveAndUpdate(t *T) error
 }

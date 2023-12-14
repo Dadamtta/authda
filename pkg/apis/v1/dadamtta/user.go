@@ -2,6 +2,7 @@ package dadamtta
 
 import (
 	"dadamtta/internal/appl"
+	"dadamtta/internal/payment_order"
 	"dadamtta/internal/product"
 	"dadamtta/internal/user"
 	"dadamtta/pkg/apis"
@@ -15,8 +16,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewUserCommand(router *gin.Engine, repository user.Repository, applRepository appl.Repository, productRepository product.Repository) {
-	service := user.NewService(repository, applRepository, productRepository)
+func NewUserCommand(router *gin.Engine, repository user.Repository, applRepository appl.Repository, applDataRepository appl.DataRepository, productRepository product.Repository, paymentOrderRepository payment_order.Repository) {
+	service := user.NewService(repository, applRepository, applDataRepository, productRepository, paymentOrderRepository)
 	SignUp(router, service)
 	SignIn(router, service)
 	CreateWeddingApp(router, service)
@@ -134,9 +135,7 @@ func UpdateWeddingAppData(router *gin.Engine, service user.Service) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, response.NewErrorResponse(response.ERROR_AUTHORIZED, ""))
 			return
 		}
-
 		err = service.UpdateAppData(user.WEDDING, token.Id, appId, &p_appl.WeddingInvitation{})
-
 		// 200
 		c.AbortWithStatus(http.StatusOK)
 	})

@@ -29,13 +29,15 @@ type service struct {
 	repository             Repository
 	productRepository      product.Repository
 	applRepository         appl.Repository
+	applDataRepository     appl.DataRepository[p_appl.WeddingInvitation]
 	paymentOrderRepository payment_order.Repository
 }
 
-func NewService(userRepository Repository, applRepository appl.Repository, productRepository product.Repository, paymentOrderRepository payment_order.Repository) Service {
+func NewService(userRepository Repository, applRepository appl.Repository, applDataRepository appl.DataRepository[p_appl.WeddingInvitation], productRepository product.Repository, paymentOrderRepository payment_order.Repository) Service {
 	return &service{
 		repository:             userRepository,
 		applRepository:         applRepository,
+		applDataRepository:     applDataRepository,
 		productRepository:      productRepository,
 		paymentOrderRepository: paymentOrderRepository,
 	}
@@ -94,25 +96,22 @@ func (s *service) UpdateAppData(appType AppType, userId, appId string, data *p_a
 	if userApp == nil {
 		return errorc.EntityNotFoundError
 	}
-	// 소유자의 요청인지 확인
 	if userApp.UserId != userId {
-		// return errors.
+		return errorc.AuthorizedError
 	}
-	// 삭제된 앱인지 확인
 	if !userApp.IsActive() {
-		// return errors.
+		return errorc.AppIsDeletedError
 	}
 	today := time.Now()
-	// 만료기간이 지났는지 확인
 	if today.After(userApp.ExpiredAt) {
-		// return errors.
+		return errorc.AppIsExpiredAtError
 	}
-
 	// 앱데이터 조회
-
+	s.applDataRepository.FindById("")
 	// 결제된 앱인지 확인
 	if s.paymentOrderRepository.ExistsByAppId(appId) {
 		// // 결제되었으면 예식날짜 변경 불가 (정책)
+
 	}
 
 	// 앱데이터 업데이트 진행

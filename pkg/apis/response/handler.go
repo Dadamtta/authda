@@ -11,6 +11,8 @@ import (
 const (
 	ERROR_DTO_UNMARSHAL             = 100001 // 요청 에러
 	ERROR_PRODUCT_NOTONSALE         = 200001 // 판매 중이 아닌 상품
+	ERROR_APP_ISDELETED             = 301001 // 삭제된 앱
+	ERROR_APP_ISEXPIRED             = 301002 // 만료된 앱
 	ERROR_POLICY_APP_OWNERSHIPLIMIT = 990001 //
 	ERROR_AUTHORIZED                = 700001 // 인증 에러
 	ERROR_ENTITY_NOTFOUND           = 900001 // DB 관련 에러
@@ -39,6 +41,14 @@ func HandleResponseErrorWithCustomMessage(context *gin.Context, err error, messa
 	} else if errors.Is(err, errorc.POLICYProductOwnershipLimitError) {
 		// 422
 		context.AbortWithStatusJSON(http.StatusUnprocessableEntity, NewErrorResponse(ERROR_PRODUCT_NOTONSALE, message))
+		return true
+	} else if errors.Is(err, errorc.AppIsDeletedError) {
+		// 409
+		context.AbortWithStatusJSON(http.StatusConflict, NewErrorResponse(ERROR_APP_ISDELETED, message))
+		return true
+	} else if errors.Is(err, errorc.AppIsExpiredAtError) {
+		// 409
+		context.AbortWithStatusJSON(http.StatusConflict, NewErrorResponse(ERROR_APP_ISEXPIRED, message))
 		return true
 	}
 	return false
