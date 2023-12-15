@@ -29,11 +29,11 @@ type service struct {
 	repository             Repository
 	productRepository      product.Repository
 	applRepository         appl.Repository
-	applDataRepository     appl.DataRepository[p_appl.WeddingInvitation]
+	applDataRepository     appl.DataRepository
 	paymentOrderRepository payment_order.Repository
 }
 
-func NewService(userRepository Repository, applRepository appl.Repository, applDataRepository appl.DataRepository[p_appl.WeddingInvitation], productRepository product.Repository, paymentOrderRepository payment_order.Repository) Service {
+func NewService(userRepository Repository, applRepository appl.Repository, applDataRepository appl.DataRepository, productRepository product.Repository, paymentOrderRepository payment_order.Repository) Service {
 	return &service{
 		repository:             userRepository,
 		applRepository:         applRepository,
@@ -106,14 +106,12 @@ func (s *service) UpdateAppData(appType AppType, userId, appId string, data *p_a
 	if today.After(userApp.ExpiredAt) {
 		return errorc.AppIsExpiredAtError
 	}
-	// 앱데이터 조회
-	s.applDataRepository.FindById("")
-	// 결제된 앱인지 확인
-	if s.paymentOrderRepository.ExistsByAppId(appId) {
-		// // 결제되었으면 예식날짜 변경 불가 (정책)
-
+	var originData p_appl.WeddingInvitation
+	err := s.applDataRepository.FindById("", originData)
+	if err != nil && s.paymentOrderRepository.ExistsByAppId(appId) {
+		data.Wedding.Year = originData.Wedding.Year
+		data.Wedding.Month = originData.Wedding.Month
+		data.Wedding.Date = originData.Wedding.Date
 	}
-
-	// 앱데이터 업데이트 진행
-	return nil
+	return s.applDataRepository.SaveAndUpdate(data)
 }
